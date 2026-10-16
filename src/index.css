@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    
+    font-family: 'DM Sans', sans-serif;
+}
+
+.app-container__wrapper{
+    background-color:#eff4ff;
+    padding:20px;
+    height:100vh;
+}
+
+.-logo-big-img{
+    width: 200px;
+}
+
+.-button-empty{
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.-margin-top-10{
+    margin-top: 10px;
+}
+
+.-gap-10{
+    gap: 10px;
+}
+
+.-display-flex{
+    display: flex;
+}
+
+.-display-flex-align-center-justify-space-between{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.-display-flex-align-center{
+    display: flex;
+    align-items: center;
+}
+
+.-display-flex-justify-spaceevenly{
+    display: flex;
+    justify-content: space-evenly;
+}
+.-display-flex-justify-spacebetween{
+    display: flex;
+    justify-content: space-between;
+}
+
+.-display-flex-align-center-justify-center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.-text-align-center{
+    text-align: center;
+}
+
+.-follow-btn{
+    background-color: #2563EB;
+    color: #fff;
+    padding: 5px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+
+.-following-btn{
+    background-color: #fff;
+    color: #2563EB;
+    padding: 5px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px solid #2563EB;
+}
+
+
+.-tags-btn{
+    margin:10px 10px 5px 0;
+    background-color: #EFF4FF;
+    color: #2563EB;
+    padding: 5px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+
+
+.-overflowY-auto{
+    overflow-y: auto;
+}
+
+.-overflowX-auto{
+    overflow-x: auto;
+}
+
+.-email-input-text-container{
+    width: 100%;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 10px;  
+}
+
+.-input-label{
+    color: grey;
+    font-size: 12px;
+}
+
+.-input-text{
+    width: 100%;
+    border: none;
+    outline: none;
+}

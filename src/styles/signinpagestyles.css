@@ -1,0 +1,21 @@
+.signin-page-container{
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.signin-form{
+    
+    width: 50%;
+}
+
+.signin-submit-button{
+    margin-top: 50px;
+    width: 100%;
+    color: #fff;
+    background-color: #2563EB;
+    border-radius: 50px;
+    border: none;
+    padding: 10px;
+
+    cursor: pointer;
+}
