@@ -12,12 +12,12 @@ const Signinpage = () => {
       <div className="-display-flex-align-center-justify-center">
         <form className="signin-form">
           <br />
-          <div className="-email-input-text-container">
+          <div className="-full-input-text-container">
             <p className="-input-label">Email</p>
             <input className="-input-text" type="text" />
           </div>
           <br />
-          <div className="-email-input-text-container">
+          <div className="-full-input-text-container">
             <p className="-input-label">Password</p>
             <input className="-input-text" type="password" />
           </div>

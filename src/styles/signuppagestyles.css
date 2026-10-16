@@ -7,3 +7,39 @@
     
     width: 30%;
 }
+
+.signup-as{
+    color: #2563EB;
+    padding: 5px;
+    background-color: transparent;
+    border: 1px solid #2563EB;
+    border-radius: 5px;
+
+    cursor: pointer;
+}
+
+.active-signupbtn{
+    color: #fff;
+    background-color: #2563EB;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
+
+.passwordError{
+    border: 1px solid red;
+}
+
+.usegoogle-signup-btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #2563EB;
+    border: 1px solid #2563EB;
+    border-radius: 50px;
+    color: #fff;
+
+    cursor: pointer;
+}

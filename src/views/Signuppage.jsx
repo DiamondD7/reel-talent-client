@@ -1,67 +1,417 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Logo from "../assets/logo/ReelTalent-logo.png";
 import { GoogleLogin } from "@react-oauth/google";
+import Logo from "../assets/logo/ReelTalent-logo.png";
+import SuccessCard from "../components/SuccessCard";
+import { apiFetch } from "../assets/js/apiFetch";
+import { GoogleLogoIcon } from "@phosphor-icons/react";
 
 import "../styles/signuppagestyles.css";
+const SignupForm = ({ setSuccess }) => {
+  const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
+  const [passwordValid, setPasswordValid] = useState(null);
+  const [passwordMatched, setPasswordMatched] = useState(false);
+
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [registerData, setRegisterData] = useState({
+    companyName: "",
+    firstName: "",
+    lastName: "",
+    role: 0, //0 is talent, 1 is casting
+    email: "",
+    password: "",
+  });
+
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+
+    setRegisterData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  useEffect(() => {
+    const match = PWD_REGEX.test(registerData.password);
+
+    if (
+      registerData.password !== confirmPassword ||
+      registerData.password.length <= 0
+    ) {
+      setPasswordMatched(false);
+    } else {
+      setPasswordMatched(true);
+    }
+
+    if (!match) {
+      setPasswordValid(false);
+    } else {
+      setPasswordValid(true);
+    }
+  }, [registerData.password, confirmPassword]);
+
+  const handleSignup = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URL}/api/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          CompanyName: registerData.companyName,
+          FirstName: registerData.firstName,
+          LastName: registerData.lastName,
+          Email: registerData.email,
+          Password: registerData.password,
+          Role: registerData.role,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network error");
+      }
+
+      const data = await response.json();
+      setSuccess(true);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+
+  return (
+    <div className="-display-flex-align-center-justify-center">
+      <form
+        className="signup-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSignup();
+        }}
+      >
+        <h4>Sign up as:</h4>
+        <div className="-display-flex -gap-10 -margin-top-10">
+          <button
+            type="button"
+            className={`signup-as ${registerData.role === 0 ? "active-signupbtn" : ""}`}
+            onClick={() => {
+              setRegisterData((prev) => ({
+                ...prev,
+                companyName: "",
+                firstName: "",
+                lastName: "",
+                role: 0,
+                password: "",
+                email: "",
+              }));
+
+              setSuccess(false);
+              setConfirmPassword("");
+              setAcceptedTerms(false);
+            }}
+          >
+            Talent
+          </button>
+          <button
+            type="button"
+            className={`signup-as ${registerData.role === 1 ? "active-signupbtn" : ""}`}
+            onClick={() => {
+              setRegisterData((prev) => ({
+                ...prev,
+                companyName: "",
+                firstName: "",
+                lastName: "",
+                role: 1,
+                password: "",
+                email: "",
+              }));
+              setSuccess(false);
+              setConfirmPassword("");
+              setAcceptedTerms(false);
+            }}
+          >
+            Casting
+          </button>
+        </div>
+        <br />
+        {registerData.role === 0 && (
+          <div className="-display-flex -gap-10">
+            <div className="-half-input-text-container">
+              <p className="-input-label">First name*</p>
+              <input
+                className="-input-text"
+                name="firstName"
+                type="text"
+                required
+                onChange={handleOnChange}
+              />
+            </div>
+            <div className="-half-input-text-container">
+              <p className="-input-label">Last name</p>
+              <input
+                className="-input-text"
+                name="lastName"
+                type="text"
+                onChange={handleOnChange}
+              />
+            </div>
+          </div>
+        )}
+        {registerData.role === 1 && (
+          <div className="-full-input-text-container">
+            <p className="-input-label">Company name *</p>
+            <input
+              className="-input-text"
+              name="companyName"
+              type="text"
+              required
+              onChange={handleOnChange}
+            />
+          </div>
+        )}
+        <br />
+        <div className="-full-input-text-container">
+          <p className="-input-label">Email *</p>
+          <input
+            className="-input-text"
+            name="email"
+            value={registerData.email}
+            type="text"
+            required
+            onChange={handleOnChange}
+          />
+        </div>
+        <br />
+        <div
+          className={`-full-input-text-container ${passwordMatched === false || !passwordValid ? "passwordError" : ""}`}
+        >
+          <p className="-input-label">Password *</p>
+          <input
+            className="-input-text"
+            name="password"
+            aria-describedby="pwd-note"
+            value={registerData.password}
+            type="password"
+            required
+            onChange={handleOnChange}
+          />
+        </div>
+        <br />
+        <div
+          className={`-full-input-text-container ${passwordMatched === false || !passwordValid ? "passwordError" : ""}`}
+        >
+          <p className="-input-label">Confirm password *</p>
+          <input
+            className="-input-text"
+            aria-describedby="confirmpwd-note"
+            value={confirmPassword}
+            type="password"
+            required
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
+
+        {!passwordMatched && (
+          <p id="confirmpwd-note" style={{ fontSize: "12px", color: "red" }}>
+            - Password do not match.
+          </p>
+        )}
+
+        {!passwordValid && (
+          <p id="pwd-note" style={{ fontSize: "12px", color: "red" }}>
+            - Password must be 8-24 characters and include an uppercase letter,
+            a lowercase letter, a number, and a special character (!@#$%).
+          </p>
+        )}
+
+        <div className="-display-flex -gap-10 -margin-top-10">
+          <input
+            type="checkbox"
+            checked={acceptedTerms}
+            onChange={(e) => setAcceptedTerms(e.target.checked)}
+          />
+          <label style={{ fontSize: "12px" }}>
+            Agree with our{" "}
+            <Link to="termsandconditions">Terms & Conditions</Link>* to sign up
+          </label>
+        </div>
+
+        <button
+          className={` ${acceptedTerms === false ? "-btn-disabled" : "signin-submit-button"}`}
+          type="submit"
+          disabled={!acceptedTerms}
+        >
+          Submit
+        </button>
+      </form>
+    </div>
+  );
+};
+
+const GoogleSignup = ({ setSuccess }) => {
+  const [role, setRole] = useState(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+  const handleGoogleSignup = async (cred) => {
+    const res = await apiFetch("/api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ IdToken: cred.credential, Role: role }),
+    });
+
+    const data = await res.json();
+    await handleSignup(data);
+  };
+
+  const handleSignup = async (payload) => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URL}/api/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          CompanyName: payload.firstName,
+          FirstName: payload.firstName,
+          LastName: payload.lastName,
+          Password: "",
+          Email: payload.email,
+          Role: role,
+          ProviderId: payload.providerId,
+          OtherProvider: true, //this is true for google signups
+        }),
+      });
+
+      if (response.status === 400) {
+        console.error("email already taken");
+      }
+
+      if (!response.ok) {
+        throw new Error("Network error");
+      }
+
+      const data = await response.json();
+      setSuccess(true);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+
+  return (
+    <>
+      <div
+        style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+      >
+        <div>
+          <div style={{ textAlign: "center" }}>
+            <h4>Sign up as:</h4>
+            <div className="-display-flex-align-center-justify-center -gap-10  -margin-top-10">
+              <button
+                type="button"
+                className={`signup-as ${role === 0 ? "active-signupbtn" : ""}`}
+                onClick={() => setRole(0)}
+              >
+                Talent
+              </button>
+              <button
+                type="button"
+                className={`signup-as ${role === 1 ? "active-signupbtn" : ""}`}
+                onClick={() => setRole(1)}
+              >
+                Casting
+              </button>
+            </div>
+          </div>
+
+          <br />
+
+          <div className="-display-flex -gap-10 -margin-top-10">
+            <input
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+            />
+            <label style={{ fontSize: "12px" }}>
+              Agree with our{" "}
+              <Link to="termsandconditions">Terms & Conditions</Link>* first
+              before signing up
+            </label>
+          </div>
+
+          {role !== null && acceptedTerms === true ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "20px",
+              }}
+            >
+              <GoogleLogin
+                text="signup_with"
+                shape="pill"
+                onSuccess={(credentialResponse) =>
+                  handleGoogleSignup(credentialResponse)
+                }
+                onError={() => console.log("failed")}
+              />
+            </div>
+          ) : (
+            ""
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
+
 const Signuppage = () => {
+  const [success, setSuccess] = useState(false);
+  const [googleSignupClicked, setGoogleSignupClicked] = useState(false);
+
   return (
     <div className="signup-page-container">
       <div style={{ textAlign: "center" }}>
         <img className="-logo-big-img" src={Logo} alt="reel-talent-logo" />
       </div>
-      <div className="-display-flex-align-center-justify-center">
-        <form className="signup-form">
-          <br />
-          <div className="-email-input-text-container">
-            <p className="-input-label">Full name *</p>
-            <input className="-input-text" type="text" required />
-          </div>
-          <br />
-          <div className="-email-input-text-container">
-            <p className="-input-label">Email *</p>
-            <input className="-input-text" type="text" required />
-          </div>
-          <br />
-          <div className="-email-input-text-container">
-            <p className="-input-label">Password *</p>
-            <input className="-input-text" type="password" required />
-          </div>
-          <br />
-          <div className="-email-input-text-container">
-            <p className="-input-label">Confirm password *</p>
-            <input className="-input-text" type="password" required />
-          </div>
 
-          <div className="-display-flex -gap-10 -margin-top-10">
-            <input type="checkbox" />
-            <label style={{ fontSize: "12px" }}>
-              Agree with our{" "}
-              <Link to="termsandconditions">Terms & Conditions</Link>*
-            </label>
+      {!googleSignupClicked && (
+        <>
+          {success === true ? (
+            <SuccessCard />
+          ) : (
+            <SignupForm setSuccess={setSuccess} />
+          )}
+          <div style={{ textAlign: "center", marginTop: "20px" }}>
+            <p>or</p>
           </div>
+        </>
+      )}
 
-          <button className="signin-submit-button" type="submit">
-            Submit
-          </button>
-        </form>
-      </div>
-
-      <div style={{ textAlign: "center", marginTop: "20px" }}>
-        <p>or</p>
-      </div>
-
-      <div
-        style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
-      >
-        <GoogleLogin
-          text="signup_with"
-          shape="pill"
-          onSuccess={(credentialResponse) => {
-            console.log(credentialResponse);
+      {!googleSignupClicked && (
+        <div
+          style={{
+            margin: "0 auto",
+            width: "50%",
+            display: "flex",
+            justifyContent: "center",
           }}
-          onError={() => console.log("failed")}
-        />
-      </div>
+        >
+          <button
+            className="usegoogle-signup-btn"
+            onClick={() => setGoogleSignupClicked(true)}
+          >
+            <GoogleLogoIcon weight="fill" /> Use Google to Sign up?
+          </button>
+        </div>
+      )}
+
+      {googleSignupClicked && <GoogleSignup setSuccess={setSuccess} />}
 
       <div style={{ textAlign: "center", marginTop: "20px" }}>
         <p style={{ fontSize: "12px" }}>
