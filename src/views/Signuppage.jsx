@@ -84,6 +84,7 @@ const SignupForm = ({ success, setSuccess }) => {
         setIsLoading(true);
         setShowError(true);
         setErrorMessage("Email already taken");
+        return;
       }
 
       if (!response.ok) {

@@ -23,6 +23,13 @@
     border: none;
     cursor: pointer;
 }
+.-text-align-center{
+    text-align: center;
+}
+
+.-margin-center{
+    margin: 0 auto;
+}
 
 .-margin-top-10{
     margin-top: 10px;
@@ -152,6 +159,16 @@
     background-color: limegreen;
     color: #fff;
     padding: 20px;
+    border-radius: 10px;
+}
+
+
+
+.-error-container{
+    width: 30%;
+    background-color: red;
+    padding: 20px;
+    color: #fff;
     border-radius: 10px;
 }
 
