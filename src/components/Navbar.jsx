@@ -8,16 +8,28 @@ import {
   SignOutIcon,
   UserIcon,
 } from "@phosphor-icons/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import "../styles/navbarstyles.css";
 const Navbar = ({ navActive, setNavActive }) => {
+  const navigate = useNavigate();
+
+  const handleSignout = (e) => {
+    e.preventDefault();
+
+    setNavActive("Signout");
+    sessionStorage.setItem("authorized", "false");
+    setTimeout(() => {
+      navigate("/signin");
+    }, 1000);
+  };
+
   return (
     <div className="navbar-container">
       <div className="-display-flex -gap-10">
         <Link
           className={`nav-button ${navActive === "Discover" ? "activeNav" : ""}`}
-          to="/"
+          to="/home"
           onClick={() => setNavActive("Discover")}
         >
           <CompassIcon
@@ -28,7 +40,7 @@ const Navbar = ({ navActive, setNavActive }) => {
         </Link>
         <Link
           className={`nav-button ${navActive === "Jobs" ? "activeNav" : ""}`}
-          to="/jobs"
+          to="/home/jobs"
           onClick={() => setNavActive("Jobs")}
         >
           <FilesIcon
@@ -39,7 +51,7 @@ const Navbar = ({ navActive, setNavActive }) => {
         </Link>
         <Link
           className={`nav-button ${navActive === "Profile" ? "activeNav" : ""}`}
-          to="/profile"
+          to="/home/profile"
           onClick={() => setNavActive("Profile")}
         >
           <UserIcon
@@ -50,17 +62,29 @@ const Navbar = ({ navActive, setNavActive }) => {
         </Link>
       </div>
 
-      <Link
-        className={`nav-button ${navActive === "Settings" ? "activeNav" : ""}`}
-        to="/settings"
-        onClick={() => setNavActive("Settings")}
-      >
-        <GearIcon
-          weight={navActive === "Settings" ? "fill" : "regular"}
-          className={`nav-icon ${navActive === "Settings" ? "activeNav" : ""}`}
-        />
-        Settings
-      </Link>
+      <div className="-display-flex">
+        <Link
+          className={`nav-button ${navActive === "Settings" ? "activeNav" : ""}`}
+          to="/home/settings"
+          onClick={() => setNavActive("Settings")}
+        >
+          <GearIcon
+            weight={navActive === "Settings" ? "fill" : "regular"}
+            className={`nav-icon ${navActive === "Settings" ? "activeNav" : ""}`}
+          />
+          Settings
+        </Link>
+        <button
+          className={`nav-button ${navActive === "Signout" ? "activeNav" : ""}`}
+          onClick={(e) => handleSignout(e)}
+        >
+          <SignOutIcon
+            weight={navActive === "Signout" ? "fill" : "regular"}
+            className={`nav-icon ${navActive === "Signout" ? "activeNav" : ""}`}
+          />
+          Sign out
+        </button>
+      </div>
     </div>
   );
 };
