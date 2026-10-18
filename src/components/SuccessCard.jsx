@@ -7,9 +7,9 @@ const SuccessCard = () => {
     <div className="-success-card-container">
       <CheckCircleIcon size={50} weight="fill" />
       <h3>Success!</h3>
-      <p style={{ fontSize: "12px" }}>
+      <p style={{ fontSize: "14px", marginTop: "10px" }}>
         You have successfully signed up your account, <br /> It is time to sign
-        in{" "}
+        in,{" "}
         <Link style={{ color: "#fff" }} to="/">
           click here
         </Link>{" "}

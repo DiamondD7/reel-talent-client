@@ -154,3 +154,16 @@
     padding: 20px;
     border-radius: 10px;
 }
+
+.btn-loading__icon {
+  animation: loadingAnimation 1s infinite;
+}
+
+@keyframes loadingAnimation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

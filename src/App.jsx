@@ -13,6 +13,7 @@ import "./App.css";
 function App() {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [navActive, setNavActive] = useState("Discover");
+
   return (
     <div className="app-container__wrapper">
       {isSignedIn ? (

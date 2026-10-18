@@ -4,13 +4,23 @@ import { GoogleLogin } from "@react-oauth/google";
 import Logo from "../assets/logo/ReelTalent-logo.png";
 import SuccessCard from "../components/SuccessCard";
 import { apiFetch } from "../assets/js/apiFetch";
-import { GoogleLogoIcon } from "@phosphor-icons/react";
+import {
+  CircleNotchIcon,
+  GoogleLogoIcon,
+  WarningCircleIcon,
+  XIcon,
+} from "@phosphor-icons/react";
 
 import "../styles/signuppagestyles.css";
-const SignupForm = ({ setSuccess }) => {
+const SignupForm = ({ success, setSuccess }) => {
   const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
   const [passwordValid, setPasswordValid] = useState(null);
   const [passwordMatched, setPasswordMatched] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -49,6 +59,7 @@ const SignupForm = ({ setSuccess }) => {
   }, [registerData.password, confirmPassword]);
 
   const handleSignup = async () => {
+    setIsLoading(true);
     try {
       const API_URL = import.meta.env.VITE_API_URL;
       const response = await fetch(`${API_URL}/api/auth/signup`, {
@@ -68,21 +79,53 @@ const SignupForm = ({ setSuccess }) => {
         }),
       });
 
+      if (response.status === 400) {
+        console.log("Email already taken");
+        setIsLoading(true);
+        setShowError(true);
+        setErrorMessage("Email already taken");
+      }
+
       if (!response.ok) {
+        setShowError(true);
         throw new Error("Network error");
       }
 
       const data = await response.json();
       setSuccess(true);
+      setShowError(false);
+      setErrorMessage("");
       console.log(data);
     } catch (err) {
       console.log(err);
       throw err;
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1500);
     }
   };
 
   return (
     <div className="-display-flex-align-center-justify-center">
+      {showError && !success ? (
+        <div className="error-message-container">
+          <div style={{ textAlign: "start" }}>
+            <button
+              className="-button-empty"
+              onClick={() => setShowError(false)}
+            >
+              <XIcon color="#fff" size={17} />
+            </button>
+          </div>
+          <WarningCircleIcon weight="fill" size={30} />
+          <h3>Ooppss</h3>
+          <p style={{ fontSize: "14px" }}>
+            Something went wrong with your request. <br />
+            {errorMessage}
+          </p>
+        </div>
+      ) : null}
       <form
         className="signup-form"
         onSubmit={(e) => {
@@ -238,20 +281,26 @@ const SignupForm = ({ setSuccess }) => {
         </div>
 
         <button
-          className={` ${acceptedTerms === false ? "-btn-disabled" : "signin-submit-button"}`}
+          className={` ${acceptedTerms === false || !passwordValid || !passwordMatched ? "-btn-disabled" : "signin-submit-button"}`}
           type="submit"
-          disabled={!acceptedTerms}
+          disabled={!acceptedTerms || !passwordValid || !passwordMatched}
         >
-          Submit
+          {isLoading ? (
+            <CircleNotchIcon className={"btn-loading__icon"} />
+          ) : (
+            "Submit"
+          )}
         </button>
       </form>
     </div>
   );
 };
 
-const GoogleSignup = ({ setSuccess }) => {
+const GoogleSignup = ({ success, setSuccess }) => {
   const [role, setRole] = useState(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleGoogleSignup = async (cred) => {
     const res = await apiFetch("/api/auth/google", {
@@ -288,14 +337,19 @@ const GoogleSignup = ({ setSuccess }) => {
 
       if (response.status === 400) {
         console.error("email already taken");
+        setErrorMessage("Email already taken");
       }
 
       if (!response.ok) {
+        setSuccess(false);
+        setShowError(true);
         throw new Error("Network error");
       }
 
       const data = await response.json();
       setSuccess(true);
+      setShowError(false);
+      setErrorMessage("");
       console.log(data);
     } catch (err) {
       console.log(err);
@@ -305,67 +359,85 @@ const GoogleSignup = ({ setSuccess }) => {
 
   return (
     <>
-      <div
-        style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
-      >
-        <div>
-          <div style={{ textAlign: "center" }}>
-            <h4>Sign up as:</h4>
-            <div className="-display-flex-align-center-justify-center -gap-10  -margin-top-10">
-              <button
-                type="button"
-                className={`signup-as ${role === 0 ? "active-signupbtn" : ""}`}
-                onClick={() => setRole(0)}
-              >
-                Talent
-              </button>
-              <button
-                type="button"
-                className={`signup-as ${role === 1 ? "active-signupbtn" : ""}`}
-                onClick={() => setRole(1)}
-              >
-                Casting
-              </button>
+      {success ? (
+        <SuccessCard />
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <div>
+            <div style={{ textAlign: "center" }}>
+              {showError && !success ? (
+                <div className="error-message-container">
+                  <WarningCircleIcon weight="fill" size={30} />
+                  <h3>Ooppss</h3>
+                  <p style={{ fontSize: "14px" }}>
+                    Something went wrong with your request. <br />
+                    {errorMessage}
+                  </p>
+                </div>
+              ) : null}
+              <h4>Sign up as:</h4>
+              <div className="-display-flex-align-center-justify-center -gap-10  -margin-top-10">
+                <button
+                  type="button"
+                  className={`signup-as ${role === 0 ? "active-signupbtn" : ""}`}
+                  onClick={() => setRole(0)}
+                >
+                  Talent
+                </button>
+                <button
+                  type="button"
+                  className={`signup-as ${role === 1 ? "active-signupbtn" : ""}`}
+                  onClick={() => setRole(1)}
+                >
+                  Casting
+                </button>
+              </div>
             </div>
-          </div>
 
-          <br />
+            <br />
 
-          <div className="-display-flex -gap-10 -margin-top-10">
-            <input
-              type="checkbox"
-              checked={acceptedTerms}
-              onChange={(e) => setAcceptedTerms(e.target.checked)}
-            />
-            <label style={{ fontSize: "12px" }}>
-              Agree with our{" "}
-              <Link to="termsandconditions">Terms & Conditions</Link>* first
-              before signing up
-            </label>
-          </div>
-
-          {role !== null && acceptedTerms === true ? (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: "20px",
-              }}
-            >
-              <GoogleLogin
-                text="signup_with"
-                shape="pill"
-                onSuccess={(credentialResponse) =>
-                  handleGoogleSignup(credentialResponse)
-                }
-                onError={() => console.log("failed")}
+            <div className="-display-flex -gap-10 -margin-top-10">
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
               />
+              <label style={{ fontSize: "12px" }}>
+                Agree with our{" "}
+                <Link to="termsandconditions">Terms & Conditions</Link>* first
+                before signing up
+              </label>
             </div>
-          ) : (
-            ""
-          )}
+
+            {role !== null && acceptedTerms === true ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "20px",
+                }}
+              >
+                <GoogleLogin
+                  text="signup_with"
+                  shape="pill"
+                  onSuccess={(credentialResponse) =>
+                    handleGoogleSignup(credentialResponse)
+                  }
+                  onError={() => setShowError(true)}
+                />
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };
@@ -385,7 +457,7 @@ const Signuppage = () => {
           {success === true ? (
             <SuccessCard />
           ) : (
-            <SignupForm setSuccess={setSuccess} />
+            <SignupForm success={success} setSuccess={setSuccess} />
           )}
           <div style={{ textAlign: "center", marginTop: "20px" }}>
             <p>or</p>
@@ -411,14 +483,18 @@ const Signuppage = () => {
         </div>
       )}
 
-      {googleSignupClicked && <GoogleSignup setSuccess={setSuccess} />}
+      {googleSignupClicked && (
+        <GoogleSignup success={success} setSuccess={setSuccess} />
+      )}
 
-      <div style={{ textAlign: "center", marginTop: "20px" }}>
-        <p style={{ fontSize: "12px" }}>
-          already have an account? <br /> <Link to="/">click here</Link> to sign
-          in
-        </p>
-      </div>
+      {!success && (
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <p style={{ fontSize: "12px" }}>
+            already have an account? <br /> <Link to="/">click here</Link> to
+            sign in
+          </p>
+        </div>
+      )}
     </div>
   );
 };

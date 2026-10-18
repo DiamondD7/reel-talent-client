@@ -43,3 +43,18 @@
 
     cursor: pointer;
 }
+
+.error-message-container{
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    text-align:center;
+
+
+    background-color: red;
+    color: #fff;
+    padding: 20px;
+    border-radius: 20px;
+}
